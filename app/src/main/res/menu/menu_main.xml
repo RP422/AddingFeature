@@ -6,14 +6,23 @@
 
 
 
-    <item
+    <item android:title="@string/action_settings"
         android:id="@+id/preferences"
-        android:title="@string/action_settings"
         app:showAsAction="never"
         />
 
-    <item android:title="@string/about"
+    <item android:title="About"
         android:id="@+id/aboutMeMenuItem"
+        app:showAsAction="never"
+        />
+
+    <item android:title="Save List"
+        android:id="@+id/saveListMenuItem"
+        app:showAsAction="never"
+        />
+
+    <item android:title="Load List"
+        android:id="@+id/loadListMenuItem"
         app:showAsAction="never"
         />
 

@@ -52,7 +52,7 @@ public class ReminderActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.reminder_layout);
         storeRetrieveData = new StoreRetrieveData(this, MainActivity.FILENAME);
-        mToDoItems = MainActivity.getLocallyStoredData(storeRetrieveData);
+        mToDoItems = MainActivity.getStoredData(storeRetrieveData);
 
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
 

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public static ArrayList<ToDoItem> getLocallyStoredData(StoreRetrieveData storeRetrieveData){
+    public static ArrayList<ToDoItem> getStoredData(StoreRetrieveData storeRetrieveData){
         ArrayList<ToDoItem> items = null;
 
         try {
@@ -128,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF_DATA_SET_CHANGED, MODE_PRIVATE);
         if(sharedPreferences.getBoolean(CHANGE_OCCURED, false)){
 
-            mToDoItemsArrayList = getLocallyStoredData(storeRetrieveData);
+            mToDoItemsArrayList = getStoredData(storeRetrieveData);
             adapter = new BasicListAdapter(mToDoItemsArrayList);
             mRecyclerView.setAdapter(adapter);
             setAlarms();
@@ -186,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
 
         storeRetrieveData = new StoreRetrieveData(this, FILENAME);
-        mToDoItemsArrayList =  getLocallyStoredData(storeRetrieveData);
+        mToDoItemsArrayList =  getStoredData(storeRetrieveData);
         adapter = new BasicListAdapter(mToDoItemsArrayList);
         setAlarms();
 
@@ -340,6 +341,16 @@ public class MainActivity extends AppCompatActivity {
             case R.id.preferences:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
+                return true;
+            case R.id.saveListMenuItem:
+                // Make a pop-up asking for a file name
+                return true;
+            case R.id.loadListMenuItem:
+                Intent fileExplorerIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                Uri uri = Uri.parse("/"); // a directory
+                fileExplorerIntent.setDataAndType(uri, "application/json");
+                startActivity(Intent.createChooser(fileExplorerIntent, "Open folder"));
+                // What do I need to do to actually load the data into the to-do list?
                 return true;
 
             default:
