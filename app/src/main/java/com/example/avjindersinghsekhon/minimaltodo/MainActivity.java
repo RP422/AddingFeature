@@ -39,38 +39,48 @@ import java.util.Collections;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
-    private RecyclerViewEmptySupport mRecyclerView;
-    private FloatingActionButton mAddToDoItemFAB;
-    private ArrayList<ToDoItem> mToDoItemsArrayList;
-    private CoordinatorLayout mCoordLayout;
-    public static final String TODOITEM = "com.avjindersinghsekhon.com.avjindersinghsekhon.minimaltodo.MainActivity";
-    private BasicListAdapter adapter;
-    private static final int REQUEST_ID_TODO_ITEM = 100;
-    private ToDoItem mJustDeletedToDoItem;
-    private int mIndexOfDeletedToDoItem;
+    public static final String CHANGE_OCCURED = "com.avjinder.changeoccured";
+    public static final String SHARED_PREF_DATA_SET_CHANGED = "com.avjindersekhon.datasetchanged";
+    public static final String RECREATE_ACTIVITY = "com.avjindersekhon.recreateactivity";
+
     public static final String DATE_TIME_FORMAT_12_HOUR = "MMM d, yyyy  h:mm a";
     public static final String DATE_TIME_FORMAT_24_HOUR = "MMM d, yyyy  k:mm";
-    public static final String FILENAME = "todoitems.json";
-    private StoreRetrieveData storeRetrieveData;
-    public ItemTouchHelper itemTouchHelper;
-    private CustomRecyclerScrollViewListener customRecyclerScrollViewListener;
-    public static final String SHARED_PREF_DATA_SET_CHANGED = "com.avjindersekhon.datasetchanged";
-    public static final String CHANGE_OCCURED = "com.avjinder.changeoccured";
-    private int mTheme = -1;
-    private String theme = "name_of_the_theme";
-    public static final String THEME_PREFERENCES = "com.avjindersekhon.themepref";
-    public static final String RECREATE_ACTIVITY = "com.avjindersekhon.recreateactivity";
-    public static final String THEME_SAVED = "com.avjindersekhon.savedtheme";
+
     public static final String DARKTHEME = "com.avjindersekon.darktheme";
     public static final String LIGHTTHEME = "com.avjindersekon.lighttheme";
+    public static final String THEME_PREFERENCES = "com.avjindersekhon.themepref";
+    public static final String THEME_SAVED = "com.avjindersekhon.savedtheme";
+
+    public static final String FILENAME = "todoitems.json";
+    public static final String TODOITEM = "com.avjindersinghsekhon.com.avjindersinghsekhon.minimaltodo.MainActivity";
+
+    public ItemTouchHelper itemTouchHelper;
+
+    private static final int REQUEST_ID_TODO_ITEM = 100;
+
     private AnalyticsApplication app;
+
+    private StoreRetrieveData storeRetrieveData;
+
+    private FloatingActionButton mAddToDoItemFAB;
+    private ArrayList<ToDoItem> mToDoItemsArrayList;
+    private ToDoItem mJustDeletedToDoItem;
+    private int mIndexOfDeletedToDoItem;
+
+    private RecyclerViewEmptySupport mRecyclerView;
+    private CustomRecyclerScrollViewListener customRecyclerScrollViewListener;
+
+    private CoordinatorLayout mCoordLayout;
+    private BasicListAdapter adapter;
+
+    private int mTheme = -1;
+    private String theme = "name_of_the_theme";
+
     private String[] testStrings = {"Clean my room",
             "Water the plants",
             "Get car washed",
             "Get my dry cleaning"
     };
-
-
 
     public static ArrayList<ToDoItem> getStoredData(StoreRetrieveData storeRetrieveData){
         ArrayList<ToDoItem> items = null;
@@ -343,14 +353,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             case R.id.saveListMenuItem:
-                // Make a pop-up asking for a file name
+                // todo Make a pop-up asking for a file name
                 return true;
             case R.id.loadListMenuItem:
                 Intent fileExplorerIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 Uri uri = Uri.parse("/"); // a directory
                 fileExplorerIntent.setDataAndType(uri, "application/json");
                 startActivity(Intent.createChooser(fileExplorerIntent, "Open folder"));
-                // What do I need to do to actually load the data into the to-do list?
+                // todo load the data into the to-do list
                 return true;
 
             default:
