@@ -1,13 +1,20 @@
 package com.example.avjindersinghsekhon.minimaltodo;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,6 +23,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -34,6 +43,7 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -81,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
             "Get car washed",
             "Get my dry cleaning"
     };
+
+    private Context mainContext = this;
 
     public static ArrayList<ToDoItem> getStoredData(StoreRetrieveData storeRetrieveData){
         ArrayList<ToDoItem> items = null;
@@ -353,19 +365,97 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             case R.id.saveListMenuItem:
-                // todo Make a pop-up asking for a file name
+                saveList();
                 return true;
             case R.id.loadListMenuItem:
-                Intent fileExplorerIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                Uri uri = Uri.parse("/"); // a directory
-                fileExplorerIntent.setDataAndType(uri, "application/json");
-                startActivity(Intent.createChooser(fileExplorerIntent, "Open folder"));
-                // todo load the data into the to-do list
+                selectFileToLoad();
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void selectFileToLoad()
+    {
+        File dir = this.getFilesDir();
+        String[] files = dir.list();
+        ArrayList<String> validFiles = new ArrayList<String>();
+
+        final String[] jsonFiles;
+
+        for(int x = 0; x < files.length; x++)
+        {
+            if(files[x].lastIndexOf(".json") == files[x].length() - 5)
+            {
+                validFiles.add(files[x].substring(0, files[x].length() - 5));
+            }
+        }
+
+        files = new String[validFiles.size()];
+        for(int x = 0; x < validFiles.size(); x++)
+        {
+            files[x] = validFiles.get(x);
+        }
+        jsonFiles = files;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Which list do you want?");
+        builder.setItems(files, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                loadList(jsonFiles[which] + ".json");
+            }
+        });
+        builder.show();
+    }
+    private void loadList(String file)
+    {
+        StoreRetrieveData loader = new StoreRetrieveData(this, file);
+        try {
+            mToDoItemsArrayList = loader.loadFromFile();
+            storeRetrieveData.saveToFile(mToDoItemsArrayList);
+        } catch (JSONException | IOException e) {
+            e.printStackTrace();
+        }
+
+        // TODO get changes to show immediately
+        adapter.items = mToDoItemsArrayList;
+        adapter.notifyDataSetChanged();
+    }
+    private void saveList()
+    {
+        String saveFileInput;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("What do you want to save the list as?");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                String saveFileInput = input.getText().toString();
+                StoreRetrieveData tempStore = new StoreRetrieveData(mainContext, saveFileInput + ".json");
+                try {
+                    tempStore.saveToFile(mToDoItemsArrayList);
+                } catch (JSONException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     @Override
@@ -396,9 +486,21 @@ public class MainActivity extends AppCompatActivity {
             if(!existed) {
                 addToDataStore(item);
             }
-
-
         }
+    }
+
+    private String getPath(Uri uri)
+    {
+        String[] projection = {MediaStore.MediaColumns.DATA };
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null)
+        {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        }
+        else
+            return "";
     }
 
     private AlarmManager getAlarmManager(){
