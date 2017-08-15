@@ -4,7 +4,6 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,7 +12,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -364,17 +362,18 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.saveListMenuItem:
-                saveList();
+            case R.id.saveListMenuItem:  // NEW STUFF HERE
+                saveListPopup();
                 return true;
             case R.id.loadListMenuItem:
                 selectFileToLoad();
-                return true;
+                return true;             // END NEW STUFF
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    /* NEW METHODS */
     private void selectFileToLoad()
     {
         File dir = this.getFilesDir();
@@ -418,34 +417,30 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // TODO get changes to show immediately
         adapter.items = mToDoItemsArrayList;
         adapter.notifyDataSetChanged();
     }
-    private void saveList()
+    private void saveListPopup()
     {
         String saveFileInput;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("What do you want to save the list as?");
 
-        // Set up the input
         final EditText input = new EditText(this);
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 
-        // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                String saveFileInput = input.getText().toString();
-                StoreRetrieveData tempStore = new StoreRetrieveData(mainContext, saveFileInput + ".json");
-                try {
-                    tempStore.saveToFile(mToDoItemsArrayList);
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
+            String saveFileInput = input.getText().toString();
+            StoreRetrieveData tempStore = new StoreRetrieveData(mainContext, saveFileInput + ".json");
+            try {
+                tempStore.saveToFile(mToDoItemsArrayList);
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+            }
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -457,6 +452,7 @@ public class MainActivity extends AppCompatActivity {
 
         builder.show();
     }
+    /* END NEW METHODS */
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
