@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String THEME_PREFERENCES = "com.avjindersekhon.themepref";
     public static final String THEME_SAVED = "com.avjindersekhon.savedtheme";
 
-    public static final String FILENAME = "todoitems.json";
+    public static final String FILENAME = "Current List.json";
     public static final String TODOITEM = "com.avjindersinghsekhon.com.avjindersinghsekhon.minimaltodo.MainActivity";
 
     public ItemTouchHelper itemTouchHelper;
